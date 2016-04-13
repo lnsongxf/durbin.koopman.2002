@@ -1,0 +1,33 @@
+ffbs.dk = function(p,m,TT,y,Z,H,Q,T,a1=0,P1=0){
+  a <- matrix(a1,m,TT+1) # Zeros because it is already initialised
+  P <- array(P1,dim=c(m,m,TT+1)) # Zero because initialised
+  v <- matrix(NA,p,TT)
+  F <- array(NA,dim=c(p,p,TT))
+  Fi <- array(NA,dim=c(p,p,TT))
+  K <- array(NA,dim=c(m,p,TT))
+  L <- array(NA,dim=c(m,m,TT))
+  # LL = 0
+  # Forward filtering
+  for (i in 1:TT){
+    v[,i] <- y[,i]-matrix(Z[,,i],p)%*%a[,i]
+    F[,,i] <- matrix(Z[,,i],p)%*%P[,,i]%*%t(matrix(Z[,,i],p))+H[,,i]
+    Fi[,,i] <- solve(F[,,i],tol=1e-30)
+    # LL <- LL + log(sum(diag(F[,,i]))) + t(v[,i]) %*% Fi[,,i]%*%v[,i]
+    K[,,i] <- T[,,i]%*%P[,,i]%*%t(matrix(Z[,,i],p))%*%Fi[,,i]
+    L[,,i] <- T[,,i]-K[,,i]%*%matrix(Z[,,i],p)
+    a[,i+1] <- T[,,i]%*%a[,i]+K[,,i]%*%matrix(v[,i],p)
+    P[,,i+1] <- T[,,i]%*%P[,,i]%*%t(L[,,i])+Q
+  }
+  # LL <- -.5 * LL
+  # Backward smoothing
+  r <- matrix(0,m,TT+1)
+  ahat <- matrix(0,m,TT+1)
+  for (i in TT:1){
+    r[,i] <- t(matrix(Z[,,i],p))%*%Fi[,,i]%*%v[,i]+t(L[,,i])%*%r[,i+1]
+  }
+  ahat[,1] <- matrix(a1,m)+P[,,1]%*%r[,1]
+  for (i in 1:TT){
+    ahat[,i+1] <- T[,,i]%*%ahat[,i] + Q%*%r[,i+1]
+  }
+  return(ahat)
+}
