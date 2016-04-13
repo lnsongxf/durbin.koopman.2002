@@ -5,4 +5,6 @@ This respository contains functions for the Kalman filter algorithm proposed in 
 
 It requires the <code>mvtnorm</code> package to draw from multivariate Normal Distributions.
 
-The function <code>dk.alg2</code> generates the $latex $y^+$ $
+<code>dk.alg2</code> generates a disturbances for the original time series and calls the Kalman filter and smoother.
+
+<code>ffbs.dk</code> runs the Kalman filter and Kalman smoother.
