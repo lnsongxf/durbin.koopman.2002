@@ -23,7 +23,7 @@ dk.alg2 = function(k,m,y,Z,H,Q,T=NULL,TT,a1=0,P1=0){
   }
 
   ystar <- y-yplus
-  astar <- kalman.filter(p=k,m=m,TT=TT,y=ystar,Z=Z,H=H,Q=Q,T=T,a1=a1,P1=P1)
+  astar <- ffbs.dk(p=k,m=m,TT=TT,y=ystar,Z=Z,H=H,Q=Q,T=T,a1=a1,P1=P1)
   atilde <- matrix(astar,m) + aplus
   return(atilde)
 }
