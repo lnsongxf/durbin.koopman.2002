@@ -1,13 +1,13 @@
 dk.alg2 = function(k,m,y,Z,H,Q,T=NULL,TT,a1=0,P1=0){
   if (is.null(T)){T=array(diag(1,m),dim=c(m,m,TT))}
   if (class(T)=="numeric"){T <- array(diag(T,m),dim=c(m,m,TT))}
-  if (class(H)=="matrix") {H <- array(H,dim=c(k,k,TT))}
-  #if (class(Q)=="matrix") {Q <- array(Q,dim=c(m,m,TT))}
+  if (class(H)=="matrix") {H <- array(H,dim=c(k,k,TT))} # Already allows for stochastic volatility
+  #if (class(Q)=="matrix") {Q <- array(Q,dim=c(m,m,TT))} # Include if Q is time-varying
 
   km <- k+m
   wplus <- matrix(NA,km,TT)
   yplus <- matrix(NA,k,TT)
-  aplus <- matrix(a1,m,TT+1)
+  aplus <- matrix(rmvnorm(1,matrix(a1,m,1),P1),m,TT+1)
   if (k==1){
     for (i in 1:TT){
       wplus[,i] <- matrix(c(rmvnorm(1,rep(0,k),H[,,i]),rmvnorm(1,rep(0,m),Q)),km)
@@ -23,6 +23,9 @@ dk.alg2 = function(k,m,y,Z,H,Q,T=NULL,TT,a1=0,P1=0){
   }
 
   ystar <- y-yplus
+  # Alternative
+  # ahat <- ffbs.dk(p=k,m=m,TT=TT,y=y,Z=Z,H=H,Q=Q,T=T,a1=a1,P1=P1)
+  # ahatplus <- ffbs.dk(p=k,m=m,TT=TT,y=yplus,Z=Z,H=H,Q=Q,T=T,a1=a1,P1=P1)
   astar <- ffbs.dk(p=k,m=m,TT=TT,y=ystar,Z=Z,H=H,Q=Q,T=T,a1=a1,P1=P1)
   atilde <- matrix(astar,m) + aplus
   return(atilde)
